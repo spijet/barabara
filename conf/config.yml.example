@@ -1,0 +1,83 @@
+bar_format: "%%{S%<monitor>s}%%{l}%<tags>s%<sep>s %%{c} %<window_title>s %%{r} %<volume>s %<battery>s %<sep>s %<time>s %<sep>s %<weather>s "
+
+bar_snippets:
+  :sep: "%%{B-}%%{F%<ac_winbr>s}|%%{F-}"
+  :timefmt: "%%H%%{F%<in_text>s}:%%{F-}%%M %%{F%<in_text>s}%%Y%%{F%<mi_text>s}%%m%%{F-}%%d"
+  :weatherfmt: "%%%%{F%<ac_winbr>s}%%<icon>s%%%%{F-} %%<sign>s%%<temp>d°"
+
+bar_opts:
+  # Panel height:
+  - "-g x12+0+12"
+  # Background color:
+  - "-B '%<in_framebr>s'"
+  # Default text color:
+  - "-F '%<ac_text>s'"
+  # WM name:
+  - "-n 'hlwm_panel'"
+  - "-a 20"
+  # Primary font:
+  - "-f '%<text_font>s'"
+  # Secondary font:
+  - "-f '%<glyph_font>s'"
+  # Pipe panel into sh:
+  # - "| sh"
+
+bar_colors:
+  ##  'Global' colors:
+  #   Inner border of a window:
+  :al_winbi: "#000000"
+
+  ##  Inactive colors:
+  #   Outer border of a frame:
+  :in_framebr: "#101010"
+  #   Inner border of a frame:
+  :in_framebg: "#565656"
+  #   Main border of a window:
+  :in_winbr: "#454545"
+  #   Outer border of a window:
+  # IN_WINBO is unset
+  #   Inner border of a window:
+  # IN_WINBI is unset
+
+  ##  Active colors:
+  :ac_framebr: "#222222"
+  :ac_framebg: "#345F0C"
+  :ac_winbr: "#9FBC00"
+  :ac_winbo: "#3E4A00"
+  :ac_winbi: "#3E4A00"
+
+  ##  Urgent colors:
+  # UR_WINBI is unset
+  :ur_winbr: "#FF0675"
+  # UR_WINBO is unset
+
+  ##  Panel-specific colors:
+  #   "Selected" text:
+  :se_text: "#101010"
+  #   Dark (inactive) text:
+  :in_text: "#909090"
+  #   "Mildly darkened" text:
+  :mi_text: "#BCBCBC"
+  #   "Active", bright text:
+  :ac_text: "#EFEFEF"
+
+tag_icons:
+  mail: ""
+  web:  ""
+  im:   ""
+  term: ""
+  files: ""
+  docs: ""
+  misc: ""
+
+fonts:
+  :text_font: "-lucy-tewi-medium-*-normal-*-11-*-*-*-*-*-*-*"
+  :glyph_font: "-wuncon-siji-medium-r-normal-*-10-100-75-75-c-80-iso10646-1"
+
+battery: "BAT1"
+
+weather:
+# Insert your own API key here:
+  :api_key: ""
+  :location: "London"
+  :unit: "c"
