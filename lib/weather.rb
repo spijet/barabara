@@ -1,14 +1,22 @@
 # coding: utf-8
+# frozen_string_literal: true
+
 class Weather
+  include Wisper::Publisher
   require 'net/http'
   require 'json'
 
-  def initialize(location: 'London', unit: 'c', api_key: '000000')
-    @uri = format_uri(api_key, location)
+  def initialize(**params)
+    params = CONFIG['weather'] if params.empty?
+
+    @api_key = params[:api_key] || '0'
+    @location = params[:location] || 'London'
+    @uri = format_uri(@api_key, @location)
     @raw_data = fetch
     @temp = 0
-    @unit = unit
+    @unit = params[:unit] || 'c'
     @icon = '?'
+    @format = params[:fmt]
   end
 
   def format_uri(api_key, location)
@@ -40,10 +48,18 @@ class Weather
 
   def render
     @raw_data = fetch
-    return { icon: '⌚', sign: '', temp: '' } unless @raw_data.is_a?(Net::HTTPSuccess)
+    return '⌚' unless @raw_data.is_a?(Net::HTTPSuccess)
 
     parse!
     sign = '+' if @temp.positive?
-    { temp: @temp, sign: sign, icon: @icon }
+    format(@format,
+           { temp: @temp, sign: sign, icon: @icon }.merge(BAR_COLORS))
+  end
+
+  def watch
+    loop do
+      publish(:event, 'weather', render)
+      sleep 900
+    end
   end
 end

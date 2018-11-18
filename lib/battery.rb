@@ -1,6 +1,15 @@
 # coding: utf-8
+# frozen_string_literal: true
+
 class Battery
-  def initialize(name = 'BAT0')
+  include Wisper::Publisher
+  ICON_LOW = "\ue034"
+  ICON_MED = "\ue036"
+  ICON_HI  = "\ue037"
+  ICON_FUL = "\ue040"
+  ICON_CHR = "\ue041"
+
+  def initialize(name = ENV['BAT'])
     @name = name
     @path = "/sys/class/power_supply/#{@name}/uevent"
     @capacity = 100
@@ -23,20 +32,24 @@ class Battery
 
   def icon
     return 'U' unless @status == 'D'
+
     case @capacity
-    when 0..30 then ''
-    when 30..60 then ''
-    when 60..80 then ''
-    when 80..100 then ''
+    when 0..35 then ICON_LOW
+    when 36..65 then ICON_MED
+    when 66..100 then ICON_HI
     else 'U'
     end
   end
 
   def format_string
     case @status
-    when 'F' then ''
-    when 'C' then ' %<capacity>d%%'
-    else '%<icon>s %<capacity>d%%:%<power>.1fW'
+    when 'F' then ICON_FUL
+    when 'C' then ICON_CHR + ' %<capacity>d%%'
+    else if @power > 3.5
+           '%<icon>s %<capacity>d%%:%<power>.0fW'
+         else
+           '%<icon>s %<capacity>d%%:%<power>.1fW'
+         end
     end
   end
 
@@ -44,12 +57,19 @@ class Battery
     {
       icon: icon,
       capacity: @capacity,
-      power:    @power
+      power: @power
     }
   end
 
   def render
     parse!
     format(format_string, to_h)
+  end
+
+  def watch
+    loop do
+      publish(:event, 'battery', render)
+      sleep @status == 'C' ? 30 : 10
+    end
   end
 end

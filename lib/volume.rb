@@ -1,9 +1,14 @@
+# frozen_string_literal: true
+
 class Volume
+  include Wisper::Publisher
   # Class constants (Icons) here.
-  ICON_MUTE = "\ue04f".freeze
-  ICON_MAX  = "\ue05d".freeze
-  ICON_MED  = "\ue050".freeze
-  ICON_LOW  = "\ue04e".freeze
+  ICON_MUTE = "\ue04f"
+  ICON_LOW  = "\ue04e"
+  ICON_MED  = "\ue050"
+  ICON_MAX  = "\ue05d"
+  CMD_WATCH = 'pactl subscribe'
+  CMD_SET   = 'amixer -q set Master'
 
   def initialize
     @icon = ICON_MUTE
@@ -15,11 +20,23 @@ class Volume
 
   def parse
     return [:in_text, ICON_MUTE] if @mute
+
     case @level
     when 60..100 then [:ac_text, ICON_MAX]
     when 30..60 then [:mi_text, ICON_MED]
     when 0..30 then [:in_text, ICON_LOW]
     end
+  end
+
+  def watch
+    PTY.spawn(CMD_WATCH) do |read, _write, pid|
+      read.each { |line| parse_line(line.chomp) }
+      Process.wait pid
+    end
+  end
+
+  def parse_line(line)
+    publish(:event, 'volume', update) if line.match?(/^Event 'change' on sink/)
   end
 
   def fetch
@@ -36,17 +53,17 @@ class Volume
   end
 
   def mute
-    spawn('amixer -q set Master toggle')
+    spawn(CMD_SET + ' toggle')
     fetch
   end
 
   def up
-    spawn('amixer -q set Master 2%+ unmute')
+    spawn(CMD_SET + ' 2%+ unmute')
     fetch
   end
 
   def down
-    spawn('amixer -q set Master 2%- unmute')
+    spawn(CMD_SET + ' 2%- unmute')
     fetch
   end
 
@@ -67,8 +84,11 @@ class Volume
   end
 
   def render
-    frm = format(format_string, to_h)
-    STDERR.puts frm
-    frm
+    format(format_string, to_h)
+  end
+
+  def update
+    fetch
+    render
   end
 end

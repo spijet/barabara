@@ -1,31 +1,32 @@
 # coding: utf-8
-def parse_event(event)
-  command, args = *event
-  case command
-  when 'volume'
-    vol ||= Volume.new
-    vol.method(args.first).call
-    return { volume: vol.render }
-  when 'time'
-    return { time: args }
-  when 'tag_changed'
-    return { tagline: tagline }
-  when /^(focus|window_title)_changed$/
-    return { window_title: format_window_title(args[1] || '') }
-  when 'battery'
-    return { battery: args }
-  when 'weather'
-    return { weather: args }
-  when /^(quit|reload)$/
-    shutdown
-  else
-    STDERR.puts 'Unknown event: ' + event.inspect
-    return {}
-  end
-end
+class EventProcessor
+  include Wisper::Publisher
 
-def shutdown
-  @event_queue.close
-  @panel_queue.close
-  @threads.each(&:exit)
+  def event(command, args)
+    return false if command == ''
+
+    # STDERR.puts "Got command \"#{command}\": #{args.inspect}."
+    out = case command
+          # when 'volume'
+          #   @vol ||= Volume.new
+          #   # vol.method(args.first).call
+          #   { volume: @vol.update }
+          when 'tagline', 'battery', 'weather', 'time', 'volume'
+            { command.to_sym => args }
+          when /^(focus|window_title)_changed$/
+            { window_title: WindowName.limit(args[1] || '') }
+          when 'window_title'
+            { window_title: sanitize_window_title(args || '') }
+          # when /^(quit|reload)$/
+          #   Wisper.publish(:control, 'shutdown')
+          else
+            STDERR.puts "Unknown event \"#{command}\": " + args.inspect
+            {}
+          end
+    publish(:update_panel, out)
+  end
+
+  def sanitize_window_title(title)
+    title.gsub('%{', '%%{')
+  end
 end
