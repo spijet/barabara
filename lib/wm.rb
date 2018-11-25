@@ -3,14 +3,18 @@ require 'pty'
 class WM
   include Wisper::Publisher
 
-  def initialize(wmname = ENV['XDG_SESSION_DESKTOP'])
+  def initialize
+    @tag_icons = GlobalConfig.config.module_config('wm')['tag_icons']
+    @colors = GlobalConfig.config.colors
+    @cmd, @wm = detect_wm(ENV['XDG_SESSION_DESKTOP'])
+  end
+
+  def detect_wm(wmname)
     case wmname
     when 'herbstluftwm'
-      @cmd = 'herbstclient --idle'
-      @wm  = 'hlwm'
+      ['herbstclient --idle', 'hlwm']
     when 'bspwm'
-      @cmd = 'bspc subscribe report'
-      @wm  = 'bspwm'
+      ['bspc subscribe report', 'bspwm']
     else
       raise NameError, 'Unknown WM!'
     end
@@ -50,12 +54,12 @@ class WM
     #  ':' -- Tag is not active, but contains windows;
     #  '!' -- Tag contains an urgent window.
     case status
-    when /[#OF]/ then { bg: BAR_COLORS[:ac_winbr], fg: BAR_COLORS[:se_text] }
-    when /[+M]/ then { bg: '#9CA668', fg: BAR_COLORS[:se_text] }
-    when /[:o]/ then { bg: BAR_COLORS[:in_framebr], fg: BAR_COLORS[:ac_text] }
-    when /[!uU]/ then { bg: BAR_COLORS[:ur_winbr], fg: BAR_COLORS[:se_text] }
-    when /[-%m]/ then { bg: BAR_COLORS[:in_text], fg: BAR_COLORS[:in_framebr] }
-    else { bg: BAR_COLORS[:in_framebr], fg: BAR_COLORS[:in_text] }
+    when /[#OF]/ then { bg: @colors[:ac_winbr], fg: @colors[:se_text] }
+    when /[+M]/ then { bg: '#9CA668', fg: @colors[:se_text] }
+    when /[:o]/ then { bg: @colors[:in_framebr], fg: @colors[:ac_text] }
+    when /[!uU]/ then { bg: @colors[:ur_winbr], fg: @colors[:se_text] }
+    when /[-%m]/ then { bg: @colors[:in_text], fg: @colors[:in_framebr] }
+    else { bg: @colors[:in_framebr], fg: @colors[:in_text] }
     end
   end
 
@@ -76,7 +80,7 @@ class WM
     tags.each do |tag|
       status, name = tag.slice!(0), tag
       vars = { monitor: monitor, tag: name,
-               icon: TAG_ICONS[name] }.merge(tag_color(status))
+               icon: @tag_icons[name] }.merge(tag_color(status))
       line << format('%%{B%<bg>s}%%{F%<fg>s}%%{A:herbstclient chain .-. '\
                      'focus_monitor %<monitor>s .-. use %<tag>s:}'\
                      ' %<icon>s %%{A}', vars)
@@ -101,7 +105,7 @@ class WM
                                 '%%{A:bspc monitor -f %<name>s:}'\
                                 ' %<name>s %%{A}', vars)
       else
-        vars = { name: name, icon: TAG_ICONS[name] || name }.merge(tag_color(status))
+        vars = { name: name, icon: @tag_icons[name] || name }.merge(tag_color(status))
         tagline[monitor] << format('%%{B%<bg>s}%%{F%<fg>s}'\
                                    '%%{A:bspc desktop -f %<name>s:}'\
                                    ' %<icon>s %%{A}', vars)

@@ -6,17 +6,18 @@ class Weather
   require 'net/http'
   require 'json'
 
-  def initialize(**params)
-    params = CONFIG['weather'] if params.empty?
+  def initialize
+    options = GlobalConfig.config.module_config('weather')
+    @colors = GlobalConfig.config.colors
 
-    @api_key = params[:api_key] || '0'
-    @location = params[:location] || 'London'
+    @api_key = options['api_key'] || '0'
+    @location = options['location'] || 'London'
     @uri = format_uri(@api_key, @location)
     @raw_data = fetch
     @temp = 0
-    @unit = params[:unit] || 'c'
+    @unit = options['unit'] || 'c'
     @icon = '?'
-    @format = params[:fmt]
+    @format = options['format']
   end
 
   def format_uri(api_key, location)
@@ -53,7 +54,7 @@ class Weather
     parse!
     sign = '+' if @temp.positive?
     format(@format,
-           { temp: @temp, sign: sign, icon: @icon }.merge(BAR_COLORS))
+           { temp: @temp, sign: sign, icon: @icon }.merge(@colors))
   end
 
   def watch

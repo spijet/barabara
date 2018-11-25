@@ -1,19 +1,21 @@
 class Clock
   include Wisper::Publisher
 
-  def initialize(format = BAR_SNIPPETS[:timefmt])
-    @format = format
+  def initialize
+    config = GlobalConfig.config.module_config('clock')
+    colors = GlobalConfig.config.colors
+    @format = format(config['format'], colors) || '%F %R'
     @time = Time.now
   end
 
-  attr_reader :time, :format
+  attr_reader :time
 
   def update
     @time = Time.now
   end
 
   def render
-    @time.strftime(format)
+    @time.strftime(@format)
   end
 
   def watch

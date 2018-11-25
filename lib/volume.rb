@@ -3,15 +3,21 @@
 class Volume
   include Wisper::Publisher
   # Class constants (Icons) here.
-  ICON_MUTE = "\ue04f"
-  ICON_LOW  = "\ue04e"
-  ICON_MED  = "\ue050"
-  ICON_MAX  = "\ue05d"
-  CMD_WATCH = 'pactl subscribe'
-  CMD_SET   = 'amixer -q set Master'
+  ICONS = {
+    mute: "\ue04f",
+    low: "\ue04e",
+    med: "\ue050",
+    max: "\ue05d"
+  }.freeze
+  CMD_WATCH = 'pactl subscribe'.freeze
+  CMD_SET   = 'amixer -q set Master'.freeze
 
   def initialize
-    @icon = ICON_MUTE
+    options = GlobalConfig.config.module_config('volume')
+    @colors = GlobalConfig.config.colors
+    @icons = options['icons'] || ICONS
+
+    @icon = :mute
     @color = :ac_text
     @mute = true
     @level = 0
@@ -19,12 +25,12 @@ class Volume
   end
 
   def parse
-    return [:in_text, ICON_MUTE] if @mute
+    return %i[in_text mute] if @mute
 
     case @level
-    when 60..100 then [:ac_text, ICON_MAX]
-    when 30..60 then [:mi_text, ICON_MED]
-    when 0..30 then [:in_text, ICON_LOW]
+    when 60..100 then %i[ac_text max]
+    when 30..60 then  %i[mi_text med]
+    when 0..30 then   %i[in_text low]
     end
   end
 
@@ -77,8 +83,8 @@ class Volume
 
   def to_h
     {
-      icon: @icon,
-      color: BAR_COLORS[@color],
+      icon: @icons[@icon],
+      color: @colors[@color],
       level: @level
     }
   end

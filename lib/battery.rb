@@ -1,22 +1,40 @@
-# coding: utf-8
 # frozen_string_literal: true
 
+# This module provides battery status functionality.
+# At the moment it just reads a status file from kernel's sysfs,
+# so it only supports Linux.
+#
+# TODO Add Upower support and make it possible
+# to select the preferred mode from config.
 class Battery
+  # Needed for message bus support
   include Wisper::Publisher
-  ICON_LOW = "\ue034"
-  ICON_MED = "\ue036"
-  ICON_HI  = "\ue037"
-  ICON_FUL = "\ue040"
-  ICON_CHR = "\ue041"
 
-  def initialize(name = ENV['BAT'])
-    @name = name
+  # Predefined status icons:
+  # TODO Move status icons off to config.
+  ICONS = {
+    low: "\ue034",
+    med: "\ue036",
+    hi: "\ue037",
+    ful: "\ue09e",
+    chr: "\ue041"
+  }.freeze
+
+  # Initialize new Battery object.
+  #
+  # @param name [String] System battery name.
+  def initialize
+    config = GlobalConfig.config.module_config('battery')
+    @name = config['name'] || ENV['BAT']
     @path = "/sys/class/power_supply/#{@name}/uevent"
     @capacity = 100
     @power = 0.0
     @status = 'U'
+    @icons = config['icons'] || ICONS
   end
 
+  # Read battery status from sysfs.
+  # Only updates the object attributes, does not return anything.
   def parse!
     IO.readlines(@path).each do |line|
       case line
@@ -30,29 +48,39 @@ class Battery
     end
   end
 
+  # Select battery status icon.
+  #
+  # @return [String] Battery status icon.
   def icon
     return 'U' unless @status == 'D'
 
     case @capacity
-    when 0..35 then ICON_LOW
-    when 36..65 then ICON_MED
-    when 66..100 then ICON_HI
+    when 0..35 then @icons[:low]
+    when 36..65 then @icons[:med]
+    when 66..100 then @icons[:hi]
     else 'U'
     end
   end
 
+  # Prepare output format string.
+  #
+  # @return [String] Format string suitable for Kernel#printf.
   def format_string
     case @status
-    when 'F' then ICON_FUL
-    when 'C' then ICON_CHR + ' %<capacity>d%%'
-    else if @power > 3.5
-           '%<icon>s %<capacity>d%%:%<power>.0fW'
-         else
-           '%<icon>s %<capacity>d%%:%<power>.1fW'
-         end
+    when 'F' then @icons[:ful]
+    when 'C' then @icons[:chr] + ' %<capacity>d%%'
+    else
+      if @power > 3.5
+        '%<icon>s %<capacity>d%%:%<power>.0fW'
+      else
+        '%<icon>s %<capacity>d%%:%<power>.1fW'
+      end
     end
   end
 
+  # Convert battery attributes to hash.
+  #
+  # @return [Hash] Attribute hash suitable for String#format.
   def to_h
     {
       icon: icon,
@@ -61,11 +89,15 @@ class Battery
     }
   end
 
+  # Render battery status as a string.
+  #
+  # @return [String] Battery status (ready for sending to the panel).
   def render
     parse!
     format(format_string, to_h)
   end
 
+  # Enter event loop and feed the message bus with events.
   def watch
     loop do
       publish(:event, 'battery', render)
