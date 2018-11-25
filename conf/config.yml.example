@@ -1,28 +1,11 @@
-bar_format: "%%{S%<monitor>s}%%{l}%<tags>s%<sep>s %%{c} %<window_title>s %%{r} %<volume>s %<battery>s %<sep>s %<time>s %<sep>s %<weather>s "
+modules:
+  - Battery
+  - WM
+  - Clock
+  - Weather
+  - Volume
 
-bar_snippets:
-  :sep: "%%{B-}%%{F%<ac_winbr>s}|%%{F-}"
-  :timefmt: "%%H%%{F%<in_text>s}:%%{F-}%%M %%{F%<in_text>s}%%Y%%{F%<mi_text>s}%%m%%{F-}%%d"
-  :weatherfmt: "%%%%{F%<ac_winbr>s}%%<icon>s%%%%{F-} %%<sign>s%%<temp>d°"
-
-bar_opts:
-  # Panel height:
-  - "-g x12+0+12"
-  # Background color:
-  - "-B '%<in_framebr>s'"
-  # Default text color:
-  - "-F '%<ac_text>s'"
-  # WM name:
-  - "-n 'hlwm_panel'"
-  - "-a 20"
-  # Primary font:
-  - "-f '%<text_font>s'"
-  # Secondary font:
-  - "-f '%<glyph_font>s'"
-  # Pipe panel into sh:
-  # - "| sh"
-
-bar_colors:
+colors:
   ##  'Global' colors:
   #   Inner border of a window:
   :al_winbi: "#000000"
@@ -61,23 +44,57 @@ bar_colors:
   #   "Active", bright text:
   :ac_text: "#EFEFEF"
 
-tag_icons:
-  mail: ""
-  web:  ""
-  im:   ""
-  term: ""
-  files: ""
-  docs: ""
-  misc: ""
+module_options:
+  lemonbar:
+    :name: barabara
+    :height: 12
+    :format: >
+      %%{S%<monitor>s}%%{l}%<tags>s%<sep>s
+      %%{c} %<window_title>s
+      %%{r} %<volume>s %<battery>s %<sep>s %<time>s %<sep>s %<weather>s
+    :fonts:
+      :text: "-lucy-tewi-medium-*-normal-*-11-*-*-*-*-*-*-*"
+      :glyphs: "-wuncon-siji-medium-r-normal-*-10-100-75-75-c-80-iso10646-1"
+    :snippets:
+      :sep: "%%{B-}%%{F%<ac_winbr>s}|%%{F-}"
+    # :extra_opts:
+      # Pipe panel into sh (needed for clicks and is unsafe!):
+      # - "| sh"
 
-fonts:
-  :text_font: "-lucy-tewi-medium-*-normal-*-11-*-*-*-*-*-*-*"
-  :glyph_font: "-wuncon-siji-medium-r-normal-*-10-100-75-75-c-80-iso10646-1"
+  clock:
+    format: "%%H%%{F%<in_text>s}:%%{F-}%%M %%{F%<in_text>s}%%Y%%{F%<mi_text>s}%%m%%{F-}%%d"
 
-battery: "BAT1"
+  wm:
+    tag_icons:
+      mail:  ""
+      work:  ""
+      web:   ""
+      im:    ""
+      term:  ""
+      dev:   ""
+      files: ""
+      doc:   ""
+      docs:  ""
+      misc:  ""
 
-weather:
-# Insert your own API key here:
-  :api_key: ""
-  :location: "London"
-  :unit: "c"
+  battery:
+    name: BAT1
+    icons:
+      :low: "\ue034"
+      :med: "\ue036"
+      :hi:  "\ue037"
+      :ful: "\ue09e"
+      :chr: "\ue041"
+
+  volume:
+    icons:
+      :mute: "\ue04f"
+      :low:  "\ue04e"
+      :med:  "\ue050"
+      :max:  "\ue05d"
+
+  weather:
+    api_key: "0000000000000000000000000000000"
+    location: "Londoon"
+    unit: "c"
+    format: "%%{F%<ac_winbr>s}%<icon>s%%{F-} %<sign>s%<temp>d°"
