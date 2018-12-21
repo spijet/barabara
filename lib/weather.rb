@@ -29,6 +29,8 @@ class Weather
 
   def fetch
     Net::HTTP.get_response(@uri)
+  rescue SocketError
+    '⌚'
   end
 
   def cond_icon(condition)
