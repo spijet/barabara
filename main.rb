@@ -14,8 +14,8 @@ Thread.abort_on_exception = true
 Dir[File.join(APP_DIR, 'lib/*.rb')].each { |lib| require lib }
 
 # Load config:
-SESSION      = ENV['XDG_SESSION_DESKTOP']
-MONITORS     = WM.get_monitors(SESSION)
+SESSION  = ENV['XDG_SESSION_DESKTOP']
+MONITORS = WM.get_monitors(SESSION)
 
 threads = []
 modules = GlobalConfig.config.modules

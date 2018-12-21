@@ -7,10 +7,6 @@ class EventProcessor
 
     # STDERR.puts "Got command \"#{command}\": #{args.inspect}."
     out = case command
-          # when 'volume'
-          #   @vol ||= Volume.new
-          #   # vol.method(args.first).call
-          #   { volume: @vol.update }
           when 'tagline', 'battery', 'weather', 'time', 'volume'
             { command.to_sym => args }
           when /^(focus|window_title)_changed$/
