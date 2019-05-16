@@ -7,7 +7,7 @@ class WindowName
   end
 
   def self.limit(line)
-    line.length > 80 ? line[0..80] + '…' : line
+    line.length > 80 ? line[0..60].gsub(/\s\w+\s*$/, '…') : line
   end
 
   def watch
