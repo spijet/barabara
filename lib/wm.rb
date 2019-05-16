@@ -39,7 +39,11 @@ class WM
   end
 
   def watch
-    publish(:event, 'tagline', hlwm_tagline) if @wm == 'hlwm'
+    if @wm == 'hlwm'
+      publish(:event, 'tagline', hlwm_tagline)
+    else
+      parse_line(`bspc wm -g`.chomp)
+    end
     PTY.spawn(@cmd) do |read, _write, pid|
       read.each { |line| parse_line(line.chomp) }
       Process.wait pid
