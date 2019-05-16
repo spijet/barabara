@@ -5,6 +5,7 @@ require 'yaml'
 require 'rubygems'
 require 'bundler'
 
+Process.setproctitle('barabara')
 APP_DIR = __dir__
 Dir.chdir(APP_DIR)
 Bundler.require :default
