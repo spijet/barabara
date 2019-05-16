@@ -7,7 +7,7 @@ class Lemonbar
   def initialize
     options = GlobalConfig.config.module_config('lemonbar')
     @colors = GlobalConfig.config.colors
-    @format = options[:format].chomp + " \n"
+    @format = options[:format].chomp
     @snippets = fill_snippets(options[:snippets])
     @cmd = ['lemonbar', *bar_options(options)].join(' ')
     @panel_data = bootstrap_panel
@@ -65,7 +65,7 @@ class Lemonbar
   end
 
   def render
-    @panel_out.puts fill_panel
+    @panel_out.puts fill_panel + "\n"
   end
 
   def update_panel(data)
