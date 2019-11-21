@@ -56,7 +56,7 @@ class Weather
     parse!
     sign = '+' if @temp.positive?
     format(@format,
-           { temp: @temp, sign: sign, icon: @icon }.merge(@colors))
+           { temp: "#{sign}#{@temp.to_i}", icon: @icon }.merge(@colors))
   end
 
   def watch

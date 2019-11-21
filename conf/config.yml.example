@@ -97,4 +97,4 @@ module_options:
     api_key: "0000000000000000000000000000000"
     location: "Londoon"
     unit: "c"
-    format: "%%{F%<ac_winbr>s}%<icon>s%%{F-} %<sign>s%<temp>d°"
+    format: "%%{F%<ac_winbr>s}%<icon>s%%{F-} %<temp>s°"
