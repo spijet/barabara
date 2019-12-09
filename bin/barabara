@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+require 'barabara'
+
+# Don't panic on SIGINT
+trap('INT') do
+  puts 'Interrupt caught, exiting.'
+  exit 0
+end
+
+Barabara.run_app

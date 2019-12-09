@@ -8,6 +8,3 @@
 /.bundle/
 /vendor/bundle
 /lib/bundler/man/
-
-## User config file:
-/conf/config.yml
