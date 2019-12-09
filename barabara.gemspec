@@ -25,7 +25,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'wisper', '~> 2.0'
   s.add_runtime_dependency 'optimist', '~> 3.0.0'
 
-  s.add_development_dependency 'bundler', '>= 2.0'
+  s.add_development_dependency 'bundler', '~> 2.0'
   s.add_development_dependency 'rspec', '~> 3.0'
   s.requirements << 'lemonbar'
 end
