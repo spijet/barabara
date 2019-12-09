@@ -16,26 +16,42 @@ some nice features available for use (threads, for example).
 
 ## Requirements
 
-As for now, this app requires Ruby 2.2.x or newer (with PTY, YAML and Wisper modules),
+As for now, this app requires Ruby 2.3.x or newer (with PTY, YAML and Wisper modules),
 Lemonbar and one of the supported WMs (BSPWM users will also need `xtitle`
 tool).
 
 ## Installation
 
-Installing **Barabara** is simple — just clone this repo anywhere you like and
-do this:
+Installing **Barabara** is simple — just install it from RubyGems and launch!
 
 ```bash
+$ gem install barabara
+<...>
+$ barabara
+```
+
+Or, if you wish to build it manually:
+```bash
 # Go to Barabara dir
-cd path/to/barabara
+$ cd path/to/barabara
 
-# Copy the example config and edit it:
-cp conf/config.yml{.example,}
-vim conf/config.yml
+# Build the gem
+$gem build barabara
 
-# Install Gem dependencies:
-bundle install
+# Install it...
+$ gem install barabara-*.gem
 
-# Run the app:
-ruby ./main.rb
+# ...and then run it:
+$ barabara
+```
+
+## Configuration
+
+By default, **barabara** expects to find its config file at
+`~/.config/barabara.conf.yml`. It'll create a default config there if it's not
+found. You can specify your own config file using the `--config=` option:
+```bash
+$ barabara --config=~/.local/share/secret/configs/barabara.conf
+# OR
+$ barabara -c ~/barabara.yml
 ```
