@@ -64,8 +64,8 @@ module Barabara
             name: "barabara", height: 12,
             format: "%%{S%<monitor>s}%%{l}%<tags>s%<sep>s %%{c} %<window_title>s %%{r} %<volume>s %<battery>s %<sep>s %<time>s %<sep>s %<weather>s\n",
             fonts: {
-              text:   "-lucy-tewi-medium-*-normal-*-11-*-*-*-*-*-*-*",
-              glyphs: "-wuncon-siji-medium-r-normal-*-10-100-75-75-c-80-iso10646-1"
+              text:   { name: "-lucy-tewi-medium-*-normal-*-11-*-*-*-*-*-*-*", offset: 0 },
+              glyphs: { name: "-wuncon-siji-medium-r-normal-*-10-100-75-75-c-80-iso10646-1", offset: 0 }
             },
             snippets:   { sep: "%%{B-}%%{F%<ac_winbr>s}|%%{F-}" },
             extra_opts: ["| sh"]

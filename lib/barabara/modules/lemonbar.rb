@@ -34,12 +34,11 @@ module Barabara
         cmd_opts = [
           "-B '#{@colors[:in_framebr]}'",
           "-F '#{@colors[:ac_text]}'",
-          "-g x#{options[:height]}+0+0",
-          "-n #{options[:name]}", '-a 30',
-          "-f #{options[:fonts][:text]}",
-          "-f #{options[:fonts][:glyphs]}"
+          "-g 'x#{options[:height]}+0+0'",
+          "-n '#{options[:name]}'", '-a 30'
         ]
-        cmd_opts << options[:extra_opts] if options.key?(:extra_opts)
+        cmd_opts.concat font_opts(options[:fonts])
+        cmd_opts.concat options[:extra_opts] if options.key?(:extra_opts)
         cmd_opts
       end
 
@@ -74,6 +73,20 @@ module Barabara
       def update_panel(data)
         @panel_data.merge!(data)
         render
+      end
+
+      private
+
+      def font_opts(fonts = {})
+        fonts.flat_map do |type, font_def|
+          if font_def.is_a? String
+            ["-f '#{font_def}'"]
+          elsif font_def.key? :offset
+            ["-o '#{font_def[:offset]}'", "-f '#{font_def[:name]}'"]
+          else
+            ["-f '#{font_def[:name]}'"]
+          end
+        end
       end
     end
   end
