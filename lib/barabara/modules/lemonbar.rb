@@ -63,7 +63,7 @@ module Barabara
                              monitor: monitor
                            ))
         end
-        string
+        string.delete "\n"
       end
 
       def render
